@@ -1,150 +1,157 @@
-# Vercel AI SDK Tutorial - Starter Project
+# Vercel AI SDK Fundamentals
 
-This is the starter project for the [Vercel AI SDK Academy Course](https://vercel.com/academy/ai-sdk), a comprehensive tutorial for building AI-powered applications using the Vercel AI SDK.
+A hands-on project that walks through the core capabilities of the [Vercel AI SDK](https://sdk.vercel.ai) — from one-shot text generation, to structured output with Zod, to a streaming chatbot with tool calling. Built as a companion to the [Vercel AI SDK Academy course](https://vercel.com/academy/ai-sdk).
 
-## About the Course
+## What's Inside
 
-The Vercel AI SDK is a free, open-source library for building AI-powered products. Created by Vercel, it enables developers to quickly integrate AI features into their projects.
+The project mixes **command-line lessons** (run as standalone scripts) with **interactive web lessons** (rendered through a Next.js 15 app). Every lesson uses the AI SDK's `generateText` / `streamText` primitives and, where useful, `Output.object()` for typed structured responses.
 
-### What You'll Learn
+| #   | Lesson                  | Mode | What it shows                                                                                  |
+| --- | ----------------------- | ---- | ---------------------------------------------------------------------------------------------- |
+| 1   | Extraction              | CLI  | Reading a file and asking the model for a 50-word takeaway via `generateText`.                 |
+| 2   | Classification          | CLI  | Tagging support requests with `category`, `urgency`, and `language` using `Output.array()`.    |
+| 2b  | Invisible AI            | CLI  | Side-by-side comparison of plain text vs. structured output, and demos of "invisible AI" UX.   |
+| 3   | Summarization           | Web  | Server Action that summarizes a thread into `headline / context / discussionPoints / takeaways`. |
+| 4   | Extraction (Calendar)   | Web  | Form that turns natural language ("Coffee with John Tuesday 2pm") into a typed appointment.    |
+| 5   | Chatbot                 | Web  | Streaming chat (`useChat`) with a `getWeather` tool that calls the Open-Meteo API.             |
 
-This 12-hour course is divided into three sections:
+All lessons default to `openai/gpt-5-mini` through the Vercel AI Gateway. Some files note `openai/gpt-5` as a swap-in for reasoning-heavy tasks.
 
-- **Foundations**: Understand LLMs, prompting techniques, and basic AI SDK usage
-- **Invisible AI**: Build seamless AI features like classification and summarization
-- **Conversational AI**: Create interactive chatbots with advanced features
+## Tech Stack
+
+- **Next.js 15** (App Router) + **React 19.2**
+- **AI SDK v6** — `ai`, `@ai-sdk/gateway`, `@ai-sdk/openai`, `@ai-sdk/react`
+- **Vercel AI Gateway** for unified model access and OIDC auth
+- **Zod** for schema-validated structured output
+- **Tailwind CSS v4** + **shadcn/ui** + **ai-elements** components
+- **TypeScript**, **tsx** for CLI lessons
+- **Yarn 4** (PnP) is the configured package manager (`packageManager` in `package.json`)
 
 ## Prerequisites
 
-- JavaScript/TypeScript knowledge
-- React familiarity
-- Node.js v20 or later (LTS recommended)
-- pnpm package manager
-- Vercel account (free)
+- Node.js v20+
+- A Vercel account (free tier is fine) to obtain a Gateway token
+- Yarn 4 — Corepack handles this automatically (`corepack enable`)
 
 ## Getting Started
 
-### 1. Clone the Repository
+### 1. Install dependencies
 
 ```bash
-git clone https://github.com/vercel/ai-sdk-fundamentals-starter.git
-cd ai-sdk-fundamentals-starter
+corepack enable
+yarn install
 ```
 
-### 2. Install Dependencies
+### 2. Configure the AI Gateway
+
+This project authenticates against Vercel AI Gateway via a short-lived `VERCEL_OIDC_TOKEN` (12h expiry). The easiest path:
 
 ```bash
-pnpm install
+yarn dlx vercel link
+yarn dlx vercel env pull
 ```
 
-### 3. Set Up Vercel AI Gateway
+This writes `.env.local` with the OIDC token. Alternatively, set `AI_GATEWAY_API_KEY` in `.env.local` to skip OIDC.
 
-This project uses [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) for unified AI model access with built-in reliability, monitoring, and load balancing.
-
-#### Link Your Project to Vercel
+Verify your setup:
 
 ```bash
-pnpm install -g vercel
-vercel link
+yarn tsx env-check.ts
 ```
 
-#### Deploy and Pull Environment Variables
+### 3. Run it
 
 ```bash
-vercel deploy
-vercel env pull
+# Web lessons (3, 4, 5) — http://localhost:3000
+yarn dev
+
+# Or use `vercel dev` for automatic OIDC token refresh
+yarn dlx vercel dev
 ```
 
-This will create a `.env.local` file with your `VERCEL_OIDC_TOKEN` which is valid for 12 hours.
+## Running the CLI Lessons
 
-#### Configure AI Provider Keys
-
-1. Go to your [Vercel Dashboard](https://vercel.com/dashboard)
-2. Navigate to AI Gateway → Integrations
-3. Add your AI provider API keys (e.g., OpenAI, Anthropic)
-4. Keys are securely stored and scoped to your Vercel team
-
-### 4. Run the Development Server
+The npm scripts in `package.json` wire `tsx` to each lesson file:
 
 ```bash
-# Use Vercel CLI for automatic OIDC token refresh
-vercel dev
-
-# Or use standard Next.js dev (manual token refresh required)
-pnpm dev
+yarn extraction              # Lesson 1: essay → 50-word takeaway
+yarn classification          # Lesson 2: classify support_requests_multilanguage.json
+yarn invisible-ai:compare    # Lesson 2b: generateText vs Output.object()
+yarn invisible-ai:demo       # Lesson 2b: form-fill + email-triage demos
 ```
-
-Open [http://localhost:3000](http://localhost:3000) to see the tutorial navigation page.
-
-## Available Lessons
-
-This starter includes code for all course lessons:
-
-### Command-Line Lessons
-
-Run these lessons using the provided npm scripts:
-
-- **Lesson 1: Extraction** - Extract structured data from text
-
-  ```bash
-  pnpm run extraction
-  ```
-
-- **Lesson 2: Classification** - Classify support requests
-  ```bash
-  pnpm run classification
-  ```
-
-### Interactive Lessons
-
-Access these through the web interface at [http://localhost:3000](http://localhost:3000):
-
-- **Lesson 3: Summarization** - Summarize message conversations
-- **Lesson 4: Extraction (Advanced)** - Extract calendar appointments from emails
-- **Lesson 5: Chatbot** - Build an interactive AI chatbot
 
 ## Project Structure
 
 ```
-├── app/
-│   ├── (1-extraction)/        # CLI extraction lesson
-│   ├── (2-classification)/    # CLI classification lesson
-│   ├── (3-summarization)/     # Web summarization lesson
-│   ├── (4-extraction)/        # Web extraction lesson
-│   ├── (5-chatbot)/          # Web chatbot lesson
-│   └── page.tsx              # Navigation homepage
-├── components/ui/            # Reusable UI components
-└── lib/                      # Utility functions
+app/
+├── (1-extraction)/             CLI — generateText on an essay
+│   ├── essay.txt
+│   └── extraction.ts
+├── (2-classification)/         CLI — Output.array() over support tickets
+│   ├── classification.ts
+│   └── support_requests*.json
+├── (2-invisible-ai)/           CLI — structured-output comparison & UX demos
+│   ├── test-structured.ts
+│   └── invisible-ai-demo.ts
+├── (3-summarization)/          Web — Server Action returning a typed summary
+│   └── summarization/
+│       ├── actions.ts          generateSummary() server action
+│       ├── page.tsx
+│       ├── message-list.tsx
+│       ├── summary-card.tsx
+│       └── messages.json
+├── (4-extraction)/             Web — natural language → calendar appointment
+│   └── extraction/
+│       ├── actions.ts          extractAppointment() server action
+│       ├── schemas.ts          Zod appointment schema
+│       ├── page.tsx
+│       └── calendar-appointment.tsx
+├── (5-chatbot)/                Web — useChat() streaming UI
+│   └── chat/
+│       ├── page.tsx
+│       └── weather.tsx         Renders the getWeather tool output
+├── api/
+│   └── chat/
+│       ├── route.ts            streamText + tool wiring
+│       └── tools.ts            getWeather tool (Open-Meteo)
+├── layout.tsx
+└── page.tsx                    Navigation home
+components/
+├── ai-elements/                Pre-built chat UI primitives
+└── ui/                         shadcn/ui components
+lib/
+└── utils.ts
+env-check.ts                    Sanity-checks AI Gateway credentials
+model-comparison.ts             Standalone fast-vs-reasoning model benchmark
 ```
+
+## Key AI SDK Patterns Used
+
+- **`generateText({ model, prompt })`** — one-shot text generation (Lesson 1).
+- **`generateText({ ..., output: Output.object({ schema }) })`** — typed single object (Lessons 3, 4, and the invisible-AI comparison).
+- **`generateText({ ..., output: Output.array({ element: schema }) })`** — typed array (Lesson 2).
+- **`streamText({ model, messages, tools, stopWhen: stepCountIs(5) })`** — streaming chat with tool calls (Lesson 5).
+- **`tool({ description, inputSchema, execute })`** — defining a callable tool (`getWeather`).
+- **`useChat()`** from `@ai-sdk/react` — client-side message state and streaming UI.
 
 ## About Vercel AI Gateway
 
-Vercel AI Gateway provides:
+The Gateway sits in front of multiple model providers and gives you:
 
-- **Unified API** - Switch between AI providers without code changes
-- **High Reliability** - Automatic request retries and failover
-- **Monitoring** - Track usage and spending across providers
-- **Security** - Securely manage API keys at the team level
-- **Load Balancing** - Distribute requests across multiple providers
+- One API for OpenAI, Anthropic, and others — swap models with a string change
+- Automatic retries and provider failover
+- Usage & spend tracking per team
+- Secure key storage scoped to your Vercel team
 
-## Technologies Used
-
-- [Next.js 15](https://nextjs.org) - React framework
-- [Vercel AI SDK](https://sdk.vercel.ai) - AI integration library
-- [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) - AI proxy service
-- [Tailwind CSS v4](https://tailwindcss.com) - Styling
-- [shadcn/ui](https://ui.shadcn.com) - UI components
-- [TypeScript](https://www.typescriptlang.org) - Type safety
+Provider keys are managed in the Vercel dashboard under **AI Gateway → Integrations**.
 
 ## Learn More
 
-- [Full Tutorial](https://vercel.com/academy/ai-sdk) - Complete the entire AI SDK course
-- [AI SDK Documentation](https://sdk.vercel.ai/docs) - Detailed SDK documentation
-- [Vercel AI Gateway Docs](https://vercel.com/docs/ai-gateway) - Gateway documentation
-- [Vercel AI Playground](https://sdk.vercel.ai/playground) - Experiment with AI models
+- [Vercel AI SDK Academy course](https://vercel.com/academy/ai-sdk)
+- [AI SDK documentation](https://sdk.vercel.ai/docs)
+- [Vercel AI Gateway docs](https://vercel.com/docs/ai-gateway)
+- [AI SDK Playground](https://sdk.vercel.ai/playground)
 
-## Deploy on Vercel
-
-The easiest way to deploy your AI application is using the [Vercel Platform](https://vercel.com).
+## Deploy
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/ai-sdk-fundamentals-starter)
