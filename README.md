@@ -151,7 +151,3 @@ Provider keys are managed in the Vercel dashboard under **AI Gateway → Integra
 - [AI SDK documentation](https://sdk.vercel.ai/docs)
 - [Vercel AI Gateway docs](https://vercel.com/docs/ai-gateway)
 - [AI SDK Playground](https://sdk.vercel.ai/playground)
-
-## Deploy
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/ai-sdk-fundamentals-starter)
