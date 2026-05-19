@@ -11,7 +11,7 @@ export interface WeatherData {
   city: string;
   temperature: number;
   weatherCode: number;
-  humidity: number;
+  humidity?: number;
 }
 
 const defaultWeatherData: WeatherData = {
@@ -91,10 +91,12 @@ export default function Weather({
           {getWeatherIcon(weatherData.weatherCode)}
         </div>
       </div>
-      <div className="mt-6 flex items-center">
-        <CloudFog size={20} aria-hidden="true" />
-        <span className="ml-2">Humidity: {weatherData.humidity}%</span>
-      </div>
+      {weatherData.humidity !== undefined && (
+        <div className="mt-6 flex items-center">
+          <CloudFog size={20} aria-hidden="true" />
+          <span className="ml-2">Humidity: {weatherData.humidity}%</span>
+        </div>
+      )}
     </div>
   );
 }

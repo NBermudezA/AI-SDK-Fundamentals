@@ -20,7 +20,7 @@ import {
 	PromptInputTextarea,
 	PromptInputSubmit,
 } from "@/components/ai-elements/prompt-input";
-import Weather from "./weather";
+import Weather, { type WeatherData } from "./weather";
  
 export default function Chat() {
 	const [input, setInput] = useState("");
@@ -55,7 +55,7 @@ export default function Chat() {
                               return (
                                 <Weather
                                   key={part.toolCallId || `${message.id}-${i}`}
-                                  weatherData={part.output}
+                                  weatherData={part.output as WeatherData}
                                 />
                               );
                             }
